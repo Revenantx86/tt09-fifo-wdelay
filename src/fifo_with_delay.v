@@ -12,36 +12,39 @@ module fifo_with_delay #(parameter FIFO_DEPTH = 16, DATA_WIDTH = 4) (
     // Internal FIFO buffer
     reg [DATA_WIDTH-1:0] fifo_mem [0:FIFO_DEPTH-1];
     reg [$clog2(FIFO_DEPTH)-1:0] write_ptr, read_ptr;
-    reg [FIFO_DEPTH:0] fifo_count;
+    integer fifo_count;
 
     // FIFO write operation
-    always @(posedge clk) begin
+    always @(posedge clk or posedge rst) begin
         if (rst) begin
             write_ptr <= 0;
             fifo_count <= 0;
             full <= 0;
+            empty <= 1;
         end else if (write_en && !full) begin
             fifo_mem[write_ptr] <= data_in;
             write_ptr <= (write_ptr + 1) % FIFO_DEPTH;
             fifo_count <= fifo_count + 1;
             full <= (fifo_count + 1 == FIFO_DEPTH);
+            empty <= 0;
         end
     end
 
     // FIFO read operation
-    always @(posedge clk) begin
+    always @(posedge clk or posedge rst) begin
         if (rst) begin
             read_ptr <= 0;
-            empty <= 1;
+            data_out <= 0;
         end else if (read_en && !empty) begin
             data_out <= fifo_mem[read_ptr];
             read_ptr <= (read_ptr + 1) % FIFO_DEPTH;
             fifo_count <= fifo_count - 1;
             empty <= (fifo_count - 1 == 0);
+            full <= 0;
         end
     end
 
-    // Full and empty flag logic
+    // Full and empty flag logic update
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             full <= 0;

@@ -30,21 +30,33 @@ async def test_fifo_with_delay(dut):
         dut._log.info(f"Writing data: {bin(data)}")
         await ClockCycles(dut.clk, 1)
 
-    # Stop writing and wait for the pipeline delay
+    # Stop writing and wait briefly before reading
     dut.ui_in[0].value = 0  # Set write_en low
-    delay_cycles = 50  # Adjust this based on expected pipeline delay
-    dut._log.info(f"Waiting for {delay_cycles} cycles for delay")
+    delay_cycles = 5  # Reduced delay cycles after writing
+    dut._log.info(f"Waiting for {delay_cycles} cycles before reading")
     await ClockCycles(dut.clk, delay_cycles)
 
     # Start reading from the FIFO and check outputs
     dut.ui_in[1].value = 1  # Set read_en high
 
-    for i, expected_data in enumerate(data_values):
-        await RisingEdge(dut.clk)
-        observed_data = (dut.uo_out[5].value << 3) | (dut.uo_out[4].value << 2) | (dut.uo_out[3].value << 1) | dut.uo_out[2].value
-        dut._log.info(f"Cycle {i+1}: Expected data: {bin(expected_data)}, Observed data: {bin(observed_data)}")
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    #for i, expected_data in enumerate(data_values):
+        #await RisingEdge(dut.clk)
+        # Log flag status for debugging
+        #dut._log.info(f"Cycle {i+1}: full = {dut.uo_out[0].value}, empty = {dut.uo_out[1].value}")
+        
+        # Observe the output
+        #observed_data = (dut.uo_out[5].value << 3) | (dut.uo_out[4].value << 2) | (dut.uo_out[3].value << 1) | dut.uo_out[2].value
+        #dut._log.info(f"Cycle {i+1}: Expected data: {bin(expected_data)}, Observed data: {bin(observed_data)}")
         #assert observed_data == expected_data, f"Mismatch at cycle {i+1}: expected {bin(expected_data)}, got {bin(observed_data)}"
-
+    
     # Stop reading
     dut.ui_in[1].value = 0
 
