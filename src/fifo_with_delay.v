@@ -15,7 +15,7 @@ module fifo_with_delay #(parameter FIFO_DEPTH = 16, DATA_WIDTH = 4) (
     integer fifo_count;
 
     // FIFO write operation
-    always @(posedge clk or posedge rst) begin
+    always @(posedge clk ) begin
         if (rst) begin
             write_ptr <= 0;
             fifo_count <= 0;
@@ -35,7 +35,7 @@ module fifo_with_delay #(parameter FIFO_DEPTH = 16, DATA_WIDTH = 4) (
     end
 
     // FIFO read operation
-    always @(posedge clk or posedge rst) begin
+    always @(posedge clk ) begin
         if (rst) begin
             read_ptr <= 0;
             data_out <= 0;
@@ -53,7 +53,7 @@ module fifo_with_delay #(parameter FIFO_DEPTH = 16, DATA_WIDTH = 4) (
     end
 
     // Full and empty flag logic update
-    always @(posedge clk or posedge rst) begin
+    always @(posedge clk ) begin
         if (rst) begin
             full <= 0;
             empty <= 1;
