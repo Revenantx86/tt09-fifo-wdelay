@@ -51,7 +51,7 @@ module tt_um_revenantx86_fifo_delay
   assign uio_oe = 8'b00;
   assign uio_out = 8'b0;
   //
-  fifo_with_delay #(.FIFO_DEPTH(16), .DATA_WIDTH(4), .PIPELINE_DEPTH(4)) 
+  fifo_with_delay #(.FIFO_DEPTH(16), .DATA_WIDTH(4)) 
       fifo_with_delay_inst (
                           .clk(clk),
                           .rst(rst),

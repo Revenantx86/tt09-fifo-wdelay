@@ -5,7 +5,7 @@
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = project.v
+PROJECT_SOURCES = fifo_with_delay.v tt_um_revenantx86_fifo_delay.v
 
 ifneq ($(GATES),yes)
 
