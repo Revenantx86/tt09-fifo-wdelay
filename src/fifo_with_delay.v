@@ -15,7 +15,7 @@ module fifo_with_delay #(parameter FIFO_DEPTH = 16, DATA_WIDTH = 4) (
     integer fifo_count;
 
     // FIFO write operation
-    always @(posedge clk) begin
+    always @(posedge clk or posedge rst) begin
         if (rst) begin
             write_ptr <= 0;
             fifo_count <= 0;
@@ -23,7 +23,11 @@ module fifo_with_delay #(parameter FIFO_DEPTH = 16, DATA_WIDTH = 4) (
             empty <= 1;
         end else if (write_en && !full) begin
             fifo_mem[write_ptr] <= data_in;
-            write_ptr <= (write_ptr + 1) % FIFO_DEPTH;
+            if (write_ptr == FIFO_DEPTH - 1)
+                write_ptr <= 0;
+            else
+                write_ptr <= write_ptr + 1;
+                
             fifo_count <= fifo_count + 1;
             full <= (fifo_count + 1 == FIFO_DEPTH);
             empty <= 0;
@@ -31,13 +35,17 @@ module fifo_with_delay #(parameter FIFO_DEPTH = 16, DATA_WIDTH = 4) (
     end
 
     // FIFO read operation
-    always @(posedge clk) begin
+    always @(posedge clk or posedge rst) begin
         if (rst) begin
             read_ptr <= 0;
             data_out <= 0;
         end else if (read_en && !empty) begin
             data_out <= fifo_mem[read_ptr];
-            read_ptr <= (read_ptr + 1) % FIFO_DEPTH;
+            if (read_ptr == FIFO_DEPTH - 1)
+                read_ptr <= 0;
+            else
+                read_ptr <= read_ptr + 1;
+
             fifo_count <= fifo_count - 1;
             empty <= (fifo_count - 1 == 0);
             full <= 0;
@@ -45,7 +53,7 @@ module fifo_with_delay #(parameter FIFO_DEPTH = 16, DATA_WIDTH = 4) (
     end
 
     // Full and empty flag logic update
-    always @(posedge clk) begin
+    always @(posedge clk or posedge rst) begin
         if (rst) begin
             full <= 0;
             empty <= 1;
